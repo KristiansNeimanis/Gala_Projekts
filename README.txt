@@ -11,12 +11,14 @@ It was developed using "Godot engine", "GDScript", "SQLite", "Blender".
 🎮 How to Play
 -----------------------------------
 - Move: "W", "A", "S", "D".
-- Sprint: "Left Shift".
+- Sprint: Hold "Left Shift".
+- Look around: "Computer Mouse"
 - Interact: "E".
 - Pause: "esc".
 - Flashlight/Lantern on/off: "F".
 
-
+❗Pro Tip
+-----------------------------------
 Try to be quiet and keep moving, or it will most definitly find you.
 
 🧩 Installation / Running the Game
@@ -49,3 +51,4 @@ Do not redistribute or sell without permission.
 -----------------------------------
 For feedback or bug reports:
 Download Godot Engine, open the source code with it and fix it yourself.
+
