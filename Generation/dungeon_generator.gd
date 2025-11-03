@@ -13,7 +13,10 @@ extends Node3D
 @export_range(0, 1) var survival_chance : float = 0.25
 @export_multiline var custom_seed : String = "" : set = set_seed
 
+@onready var locations = $Locations
+
 var player_pos
+var monster_pos
 
 var room_counter : int = 0
 
@@ -33,6 +36,9 @@ func set_border_size(val:int)->void:
 		visualize_border()
 
 func generate():
+	var children = locations.get_children()
+	for child in children:
+		child.queue_free()
 	room_counter = 0
 	room_tiles.clear()
 	room_positions.clear()
@@ -140,8 +146,14 @@ func make_room(rec:int):
 	var pos : Vector3 = Vector3(avg_x, 0, avg_z)
 	room_positions.append(pos)
 	
+	var location_box = load("res://Scenes/location_box.tscn").instantiate()
+	location_box.global_position = Vector3(avg_x * 2, 1, avg_z * 2)
+	locations.add_child(location_box)
+	
 	if room_counter == 0:
 		player_pos = (pos * 2) + Vector3(0,1,0)
+	if room_counter == 1:
+		monster_pos = (pos * 2) + Vector3(0,1,0)
 	room_counter += 1
 
 func create_hallways(hallway_graph:AStar2D):

@@ -1,7 +1,8 @@
 @tool
 extends Node3D
 
-@onready var player = $"../.."
+@onready var dungeon_generator = $"../.."
+
 @onready var navigation_region_3d = $".."
 
 @export var grid_map_path : NodePath
@@ -115,5 +116,8 @@ func create_dungeon():
 					call("handle_"+key,dun_cell,directions.keys()[i])
 		if t%10 == 9 : await get_tree().create_timer(0).timeout
 	navigation_region_3d.bake_navigation_mesh(true)
-	if player.player_pos != null:
-		$"../../Player".global_transform.origin = player.player_pos
+	
+	if dungeon_generator.player_pos != null:
+		$"../../Player".global_transform.origin = dungeon_generator.player_pos
+	if dungeon_generator.player_pos != null:
+		$"../../Monster_1".global_transform.origin = dungeon_generator.monster_pos
