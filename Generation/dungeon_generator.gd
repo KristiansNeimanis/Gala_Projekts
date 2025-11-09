@@ -149,6 +149,14 @@ func make_room(rec:int):
 	var location_box = load("res://Scenes/location_box.tscn").instantiate()
 	location_box.global_position = Vector3(avg_x * 2, 1, avg_z * 2)
 	locations.add_child(location_box)
+	locations.get_child(room_counter)
+	
+	var counter = 0
+	for child in locations.get_children():
+		var mesh_instance = child.get_child(1)
+		mesh_instance.mesh = mesh_instance.mesh.duplicate()
+		mesh_instance.mesh.text = str(counter)
+		counter += 1
 	
 	if room_counter == 0:
 		player_pos = (pos * 2) + Vector3(0,1,0)

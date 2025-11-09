@@ -92,18 +92,18 @@ func _physics_process(_delta):
 
 	if seeing == true:
 		going = false
-		SPEED = 5
+		SPEED = 3
 		self.update_target_location(player.global_transform.origin)
 		
 	else:
 		if are_alert == true:
-			SPEED = 4.5
+			SPEED = 3.5
 		if going == false:
 			going = true
 			_set_new_destination()
 	
 	if is_standing == false:
-		if seeing == true or are_alert == true:
+		if seeing == true or are_alert == true or going == true:
 			if animation.animation_finished:
 				animation.speed_scale = 1
 				animation.play("Run_Forward")
@@ -114,11 +114,12 @@ func _physics_process(_delta):
 			
 			var current_location = self.global_transform.origin
 			next_location = nav.get_next_path_position()
-			var new_velocity = (next_location - current_location).normalized() * SPEED
 			
-			character.look_at(next_location)
+			if next_location != Vector3.ZERO:
+				var new_velocity = (next_location - current_location).normalized() * SPEED
+				character.look_at(next_location)
+				nav.set_velocity(new_velocity)
 			
-			nav.set_velocity(new_velocity)
 				
 			if seen_timer.is_stopped() and !seeing:
 				tracking = false
@@ -142,8 +143,8 @@ func _set_new_destination():
 		SPEED = 2
 	var loc = locations.get_children()
 	var location = loc.pick_random()
-	print(location)
-	self.update_target_location(location.global_position)
+	print(location.get_child(1).mesh.text, location.global_transform.origin)
+	self.update_target_location(location.global_transform.origin)
 	print("going")
 
 
