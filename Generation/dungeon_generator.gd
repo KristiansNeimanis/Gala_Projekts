@@ -11,6 +11,7 @@ extends Node3D
 @export var room_margin : int = 1
 @export var room_recursion : int = 15
 @export_range(0, 1) var survival_chance : float = 0.25
+@export var puzzle_number : int = 7
 @export_multiline var custom_seed : String = "" : set = set_seed
 
 @onready var locations = $Locations

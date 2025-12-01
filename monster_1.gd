@@ -46,7 +46,7 @@ func _process(_delta):
 	if seeing == false and are_alert == false:
 		if decided == false:
 			decided = true
-			random_decision.wait_time = randf_range(10, 30)
+			random_decision.wait_time = randf_range(4, 5)
 			random_decision.start()
 	
 	if is_in_attack_range == true and seeing == true:
@@ -132,6 +132,8 @@ func _physics_process(_delta):
 				self.velocity = Vector3(-0.1,0,-0.1)
 				if animation.animation_finished:
 					animation.play("Idle")
+	else:
+		self.velocity = self.velocity * (-1)
 
 func update_target_location(target_location):
 	nav.target_position = target_location
@@ -150,17 +152,18 @@ func _set_new_destination():
 
 func _on_navigation_agent_3d_target_reached():
 	if seeing == false:
-		self.going = false
+		self.going = false 
 		print("target reached")
-		_set_new_destination()
 
 
 func _on_attack_area_body_entered(body):
 	if body.name == player.name:
+		print("Hit")
 		is_in_attack_range = true
 
 func _on_attack_area_body_exited(body):
 	if body.name == player.name:
+		print("Miss")
 		is_in_attack_range = false
 
 func _on_navigation_agent_3d_velocity_computed(safe_velocity):
@@ -213,3 +216,4 @@ func _on_random_decision_timeout():
 
 func _on_stand_timer_timeout():
 	is_standing = false
+	SPEED = 2
