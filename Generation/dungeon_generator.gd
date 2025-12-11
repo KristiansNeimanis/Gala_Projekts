@@ -108,7 +108,7 @@ func visualize_border():
 		grid_map.set_cell_item(Vector3i(-1, 0, i), 3)
 
 func make_room(rec:int):
-	if !rec>0:
+	if rec <= 0:
 		return
 	
 	var width : int  = (randi() % (max_room_size - min_room_size)) + min_room_size
