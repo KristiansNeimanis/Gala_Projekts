@@ -7,3 +7,8 @@ func Delete_puzzles():
 	if not possible_puzzle_box.has_overlapping_bodies():
 		print("DELETING EXCESS")
 		self.queue_free()
+
+func interacted_with():
+	$"../../PuzzlesManager".puzzle_completed()
+	print("PUZZLE COMPLETE")
+	self.queue_free()
