@@ -26,6 +26,7 @@ signal step
 
 @onready var head := $Head
 @onready var camera := $Head/Camera3D
+@onready var interaction_ray = $Head/Camera3D/interaction_ray
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
@@ -35,6 +36,17 @@ var light_on = true
 
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+func interaction_step():
+	var raycast_colider = interaction_ray.get_collider()
+	
+	if raycast_colider and (raycast_colider.is_in_group("Puzzle") or raycast_colider.is_in_group("Exit")):
+		$UI/interaction_text.visible = true
+		
+		if Input.is_action_just_pressed("interact"):
+			raycast_colider.interacted_with()
+	else:
+		$UI/interaction_text.visible = false
 
 func _unhandled_input(event):
 	if event is InputEventMouseMotion:
@@ -49,6 +61,8 @@ func _physics_process(delta):
 		velocity.y -= gravity * delta
 	
 	stamina.value = STAMINA
+	
+	interaction_step()
 	
 	if Input.is_action_pressed("move_run") and STAMINA > 0 and Input.get_vector("move_left", "move_right", "move_forward", "move_backwards"):
 		is_running = true
