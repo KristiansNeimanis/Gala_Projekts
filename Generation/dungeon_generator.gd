@@ -163,6 +163,9 @@ func make_room(rec:int):
 		player_pos = (pos * 2) + Vector3(0,1,0)
 	if room_counter == 1:
 		monster_pos = (pos * 2) + Vector3(0,1,0)
+		var exit = load("res://Scenes/exit.tscn").instantiate()
+		exit.global_position = Vector3(avg_x * 2, 1, avg_z * 2)
+		self.add_child(exit)
 	room_counter += 1
 
 func create_hallways(hallway_graph:AStar2D):
