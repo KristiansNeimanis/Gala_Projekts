@@ -109,6 +109,7 @@ func create_dungeon():
 			if cell_index == 0 or cell_index == 5:
 				var puzzle_box = load("res://Scenes/possible_puzzle_box.tscn").instantiate()
 				puzzle_box.global_position = dun_cell.position + Vector3(0.9, 1.5, 0)
+				puzzle_box.rotation = Vector3(0, 3.15, 0)
 				puzzles.add_child(puzzle_box)
 				puzzle_box = load("res://Scenes/possible_puzzle_box.tscn").instantiate()
 				puzzle_box.global_position = dun_cell.position + Vector3(-0.9, 1.5, 0)
@@ -121,7 +122,6 @@ func create_dungeon():
 				puzzle_box.global_position = dun_cell.position + Vector3(0, 1.5, -0.9)
 				puzzle_box.rotation = Vector3(0, -1.55, 0)
 				puzzles.add_child(puzzle_box)
-				
 			
 			add_child(dun_cell)
 			dun_cell.set_owner(owner)
@@ -147,6 +147,8 @@ func create_dungeon():
 		$"../../Monster_1".global_transform.origin = dungeon_generator.monster_pos
 
 func puzzle_selecting():
+	var pi = PI
+	print(pi)
 	for child in puzzles.get_children():
 		await get_tree().create_timer(0).timeout
 		await child.Delete_puzzles()
