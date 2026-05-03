@@ -33,6 +33,7 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 
 var light_on = true
+var current_target = null
 
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -41,12 +42,28 @@ func interaction_step():
 	var raycast_colider = interaction_ray.get_collider()
 	
 	if raycast_colider and (raycast_colider.is_in_group("Puzzle") or raycast_colider.is_in_group("Exit")):
-		$UI/interaction_text.visible = true
+		current_target = raycast_colider
 		
-		if Input.is_action_just_pressed("interact"):
-			raycast_colider.interacted_with()
+		if current_target.is_in_group("Exit"):
+			$UI/interaction_text.visible = true
+			if Input.is_action_just_pressed("interact"):
+				current_target.interacted_with()
+			
+		if current_target.is_in_group("Puzzle"):
+			$UI/interaction_text2.visible = true
+			if Input.is_action_pressed("interact") and raycast_colider == current_target:
+				current_target.start_hold()
+			else:
+				if current_target and is_instance_valid(current_target):
+					current_target.stop_hold()
 	else:
 		$UI/interaction_text.visible = false
+		$UI/interaction_text2.visible = false
+		
+		if current_target and is_instance_valid(current_target):
+			current_target.stop_hold()
+		
+		current_target = null
 
 func _unhandled_input(event):
 	if event is InputEventMouseMotion:
