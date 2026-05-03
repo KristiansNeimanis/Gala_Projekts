@@ -138,6 +138,9 @@ func create_dungeon():
 		if t%10 == 9 : await get_tree().create_timer(0).timeout
 	navigation_region_3d.bake_navigation_mesh(true)
 	
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	
 	puzzle_selecting()
 	
 	
@@ -149,9 +152,15 @@ func create_dungeon():
 func puzzle_selecting():
 	var pi = PI
 	print(pi)
+	
+	await get_tree().process_frame
+	
 	for child in puzzles.get_children():
 		await get_tree().create_timer(0).timeout
 		await child.Delete_puzzles()
+	
+	await get_tree().process_frame
+	await get_tree().process_frame
 	
 	var PUZZLES = puzzles.get_children()
 	var SELECTED_PUZZLES = selected_puzzles.get_children()

@@ -1,18 +1,27 @@
-@tool
+#@tool
 extends Node3D
 
-@onready var grid_map : GridMap = $GridMap
+#@export var start : bool = false : set = set_start
+#@export var border_size : int = 20 : set = set_border_size
+#@export var min_room_size : int = 2
+#@export var max_room_size : int = 4
+#@export var room_number : int = 4
+#@export var room_margin : int = 1
+#@export var room_recursion : int = 15
+#@export_range(0, 1) var survival_chance : float = 0.25
+#@export var puzzle_number : int = 7
+#@export_multiline var custom_seed : String = "" : set = set_seed
 
-@export var start : bool = false : set = set_start
-@export var border_size : int = 20 : set = set_border_size
-@export var min_room_size : int = 2
-@export var max_room_size : int = 4
-@export var room_number : int = 4
-@export var room_margin : int = 1
-@export var room_recursion : int = 15
-@export_range(0, 1) var survival_chance : float = 0.25
-@export var puzzle_number : int = 7
-@export_multiline var custom_seed : String = "" : set = set_seed
+@onready var grid_map : GridMap = $GridMap
+var border_size = GameplaySettings.border
+var min_room_size = GameplaySettings.min
+var max_room_size = GameplaySettings.max
+var room_number = GameplaySettings.room
+var room_margin : int = 1
+var room_recursion : int = 15
+var survival_chance = GameplaySettings.hallway
+var puzzle_number = GameplaySettings.puzzle
+var custom_seed = GameplaySettings.seed
 
 @onready var locations = $Locations
 
@@ -26,6 +35,15 @@ var room_positions : PackedVector3Array = []
 
 func _ready():
 	generate()
+
+func apply_settongs():
+	border_size = GameplaySettings.border
+	min_room_size = GameplaySettings.min
+	max_room_size = GameplaySettings.max
+	room_number = GameplaySettings.room
+	survival_chance = GameplaySettings.hallway
+	puzzle_number = GameplaySettings.puzzle
+	custom_seed = GameplaySettings.seed
 
 func set_start(val:bool)->void:
 	if Engine.is_editor_hint():
