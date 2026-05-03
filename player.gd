@@ -59,6 +59,7 @@ func interaction_step():
 	else:
 		$UI/interaction_text.visible = false
 		$UI/interaction_text2.visible = false
+		current_target = null
 		
 		if current_target and is_instance_valid(current_target):
 			current_target.stop_hold()

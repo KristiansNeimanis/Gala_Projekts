@@ -2,22 +2,20 @@ extends CharacterBody3D
 
 @onready var player = $"../Player"
 @onready var pointer = $pointer
-@export var seeing = false
-@export var in_cone = false
-@export var going = false
+@onready var seeing = false
+@onready var in_cone = false
+@onready var going = false
 @onready var locations = $"../Locations"
-@export var p_collider = null
+@onready var p_collider = null
 @onready var seen_timer = $seen_timer
-@export var tracking = false
+@onready var tracking = false
 var tracking_lost_sight = false
 
-@onready var animation = $character/axe_man2/AnimationPlayer
+@onready var animation = $character/Animation
 
 @onready var agent = $NavigationAgent3D
 
-@onready var physical = $character/axe_man2/Armature/Skeleton3D/PhysicalBoneSimulator3D
 @onready var character = $character
-@onready var armature = $character/axe_man2/Armature
 
 @onready var attack_area = $Attack_area
 var is_attacking = false
@@ -29,7 +27,16 @@ var is_in_attack_range = false
 @onready var nav = $NavigationAgent3D
 var next_location
 
-@export var SPEED = 2
+@onready var SPEED = 1.75
+@onready var WALK_SPEED = 1.75
+@onready var RUN_SPEED = 3.6
+
+const BOB_FREQ = 2.5
+const BOB_AMP = 0.13
+var t_bob = 0.0
+@onready var camera = $Camera
+var can_play : bool = true
+signal step
 
 var can_hear = false
 var are_alert = false
@@ -41,179 +48,200 @@ var decided = false
 @onready var stand_timer = $Stand_timer
 var is_standing = false
 
+@onready var groan = $groan
+@onready var roar = $roar
+
 
 func _process(_delta):
 	if seeing == false and are_alert == false:
 		if decided == false:
 			decided = true
-			random_decision.wait_time = randf_range(4, 5)
+			random_decision.wait_time = randf_range(4, 6)
 			random_decision.start()
 	
 	if is_in_attack_range == true and seeing == true:
-		animation.speed_scale = 3.5
-		var rand = randi_range(0, 1)
-		if(rand == 0):
-			animation.play("Throw")
-		else:
-			animation.play("Throw_2")
+		animation.speed_scale = 1.1
+		animation.play("Bite_Action")
+
 
 func _ready():
-	stand_timer.wait_time = 2
+	stand_timer.wait_time = 4
 	seen_timer.wait_time = 5
 	
-	physical.active = false
-	
-	animation.play("Walk_Foward")
+	animation.play("Walk1_Action")
 
 
-func _physics_process(_delta):
+func _physics_process(delta):
 	self.pointer.look_at(player.global_transform.origin)
+	
+	if is_standing:
+		velocity = Vector3.ZERO
+		nav.set_velocity(Vector3.ZERO)
+
+		if animation.current_animation != "Idle1_Action":
+			animation.play("Idle1_Action")
+
+		move_and_slide()
+		return
+
 	if self.pointer.is_colliding():
 		p_collider = self.pointer.get_collider()
 		if p_collider.is_in_group("Player") == true and in_cone == true:
 			seeing = true
-			
 			seen_timer.stop()
-			if !tracking:  # Only start tracking if we weren't already
+
+			if !tracking:
+				roar.play()
 				tracking = true
 				tracking_lost_sight = false
-				print("Started tracking")
 		else:
 			if tracking == true and !tracking_lost_sight:
 				tracking = false
-				print("Player no longer visible, starting timer to stop tracking")
-				seen_timer.start()  # Start the timer to stop tracking
-				tracking_lost_sight = true  # Mark that we started the timer
+				seen_timer.start()
+				tracking_lost_sight = true
 
 	if !seeing and tracking and seen_timer.is_stopped():
 		tracking = false
-		tracking_lost_sight = false  # Reset the flag once tracking stops
-		print("Stopped tracking after timer ran out.")
+		tracking_lost_sight = false
 
 	if seeing == true:
 		going = false
-		SPEED = 3
-		self.update_target_location(player.global_transform.origin)
-		
+		SPEED = RUN_SPEED
+		update_target_location(player.global_transform.origin)
 	else:
 		if are_alert == true:
-			SPEED = 3.5
+			SPEED = RUN_SPEED
 		if going == false:
 			going = true
 			_set_new_destination()
-	
-	if is_standing == false:
-		if seeing == true or are_alert == true or going == true:
-			if animation.animation_finished:
-				animation.speed_scale = 1
-				animation.play("Run_Forward")
-			else:
-				if animation.animation_finished:
-					animation.speed_scale = 1
-					animation.play("Walk_Foward")
-			
-			var current_location = self.global_transform.origin
-			next_location = nav.get_next_path_position()
-			
-			if next_location != Vector3.ZERO:
-				var new_velocity = (next_location - current_location).normalized() * SPEED
-				character.look_at(next_location)
-				nav.set_velocity(new_velocity)
-			
-				
-			if seen_timer.is_stopped() and !seeing:
-				tracking = false
-				
-				
-		else:
-			if seeing == true or are_alert == true:
-				is_standing = false
-			else:
-				self.velocity = Vector3(-0.1,0,-0.1)
-				if animation.animation_finished:
-					animation.play("Idle")
+
+	if seeing == true or are_alert == true:
+		if is_in_attack_range == true and seeing == true:
+			pass
+		elif animation.current_animation != "Walk1_Action":
+			animation.speed_scale = 2
+			animation.play("Walk1_Action")
 	else:
-		self.velocity = self.velocity * (-1)
+		if animation.current_animation != "Walk1_Action":
+			animation.speed_scale = 0.6
+			animation.play("Walk1_Action")
+
+	var current_location = self.global_transform.origin
+	next_location = nav.get_next_path_position()
+
+	if next_location != Vector3.ZERO:
+		var new_velocity = (next_location - current_location).normalized() * SPEED
+		character.look_at(next_location)
+		nav.set_velocity(new_velocity)
+
+	if is_standing:
+		if animation.current_animation != "Idle2_Action":
+			animation.play("Idle2_Action")
+	
+	t_bob += delta * velocity.length() * float(is_on_floor())
+	camera.transform.origin = _headbob(t_bob)
+	
+	#head bob
+	t_bob += delta * velocity.length() * float(is_on_floor())
+	camera.transform.origin = _headbob(t_bob)
+
+func _headbob(time) -> Vector3:
+	var pos = Vector3.ZERO
+	pos.y = sin(time * BOB_FREQ) * BOB_AMP
+	pos.x = cos(time * BOB_FREQ / 2) * BOB_AMP
+	
+	var low_pos  = BOB_AMP - 0.05
+	if pos.y > -low_pos:
+		can_play = true
+	
+	if pos.y < -low_pos and can_play:
+		can_play = false
+		emit_signal("step")
+		
+	return pos
 
 func update_target_location(target_location):
 	nav.target_position = target_location
 
+
 func _set_new_destination():
 	if are_alert == true:
-			SPEED = 4.5
+		SPEED = RUN_SPEED
 	else:
-		SPEED = 2
+		SPEED = WALK_SPEED
+
 	var loc = locations.get_children()
 	var location = loc.pick_random()
-	print(location.get_child(1).mesh.text, location.global_transform.origin)
-	self.update_target_location(location.global_transform.origin)
-	print("going")
+
+	update_target_location(location.global_transform.origin)
 
 
 func _on_navigation_agent_3d_target_reached():
 	if seeing == false:
-		self.going = false 
-		print("target reached")
+		self.going = false
+		_set_new_destination()
 
 
 func _on_attack_area_body_entered(body):
 	if body.name == player.name:
-		print("Hit")
 		is_in_attack_range = true
+
 
 func _on_attack_area_body_exited(body):
 	if body.name == player.name:
-		print("Miss")
 		is_in_attack_range = false
+
 
 func _on_navigation_agent_3d_velocity_computed(safe_velocity):
 	velocity = velocity.move_toward(safe_velocity, .25)
 	move_and_slide()
 
+
 func _on_vision_cone_body_entered(body):
 	if body.name == player.name:
-		print("in cone")
 		in_cone = true
-		
+
 
 func _on_vision_cone_body_exited(body):
 	if body.name == player.name:
-		print("out of cone")
 		in_cone = false
 
+
 func _on_seen_timer_timeout():
-	print("=================")
-	print("STOPED TRACKING")
-	print("=================")
-	tracking = false  # Stop tracking after timer finishes
-	tracking_lost_sight = false  # Reset the flag
-	seeing = false  # Optionally reset seeing as well
+	tracking = false
+	tracking_lost_sight = false
+	seeing = false
 
-
-func _on_hear_area_body_entered(body):
-	if body.name == player.name:
-		can_hear = true
-
-
-func _on_hear_area_body_exited(body):
-	if body.name == player.name:
-		can_hear = false
 
 func _on_random_decision_timeout():
-	var rand = randi() % 2
-	if rand == 0:
-		if seeing == false and are_alert == false:
-			is_standing = true
-			stand_timer.start()
-	if rand == 1:
-		if seeing == false and are_alert == false:
-			is_standing = true
-			stand_timer.start()
-			
-			_set_new_destination()
+	if seeing == true or are_alert == true:
+		decided = false
+		return
+
+	var roll = randf()
+
+	if roll < 0.30:
+		is_standing = true
+		stand_timer.start()
+		groan.play()
+
+	elif roll < 0.90:
+		pass
+
+	else:
+		is_standing = true
+		stand_timer.start()
+		_set_new_destination()
+		groan.play()
+
 	decided = false
 
 
 func _on_stand_timer_timeout():
 	is_standing = false
-	SPEED = 2
+	SPEED = WALK_SPEED
+
+
+func _on_animation_animation_finished(anim_name):
+	if anim_name == "Bite_Action" and is_in_attack_range:
+		get_tree().change_scene_to_file("res://Scenes/Menu_stuff/dead.tscn")
