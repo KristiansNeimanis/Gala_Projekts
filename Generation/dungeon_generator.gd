@@ -33,8 +33,15 @@ var room_counter : int = 0
 var room_tiles : Array[PackedVector3Array] = []
 var room_positions : PackedVector3Array = []
 
+var paused = false
+@onready var pause_menu = $PauseMenu
+
 func _ready():
 	generate()
+
+func _process(_delta):
+	if Input.is_action_just_pressed("pause"):
+		pauseMenu()
 
 func apply_settongs():
 	border_size = GameplaySettings.border
@@ -182,7 +189,7 @@ func make_room(rec:int):
 	if room_counter == 1:
 		monster_pos = (pos * 2) + Vector3(0,1,0)
 		var exit = load("res://Scenes/exit.tscn").instantiate()
-		exit.global_position = Vector3(avg_x * 2, 1, avg_z * 2)
+		exit.global_position = Vector3(avg_x * 2, 0.2, avg_z * 2)
 		self.add_child(exit)
 	room_counter += 1
 
@@ -236,3 +243,14 @@ func create_hallways(hallway_graph:AStar2D):
 func set_seed(val:String)->void:
 	custom_seed = val
 	seed(val.hash())
+
+func pauseMenu():
+	if paused:
+		pause_menu.hide()
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+		get_tree().paused = false
+	else:
+		pause_menu.show()
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		get_tree().paused = true
+	paused = !paused
