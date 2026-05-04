@@ -4,6 +4,10 @@ extends Area3D
 @onready var audio_stream_player_3d = $AudioStreamPlayer3D
 @onready var lid = $lid
 
+func _ready():
+	var manager = get_node("/root/PuzzlesManager")
+	manager.all_puzzles_completed.connect(enable_exit)
+	
 func enable_exit():
 	collision_shape_3d.disabled = false
 	lid.position = Vector3(-0.15, 0.3, 0)
