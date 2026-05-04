@@ -17,3 +17,7 @@ func _on_start_pressed():
 	GameplaySettings.puzzle = puzzle.text.to_int()
 	GameplaySettings.seed = seed.text
 	LoadsManager.load_scene("res://Dungeon_generation/dungeon_generator.tscn")
+
+
+func _on_main_pressed():
+	get_tree().change_scene_to_file("res://Scenes/Menu_stuff/main_menu.tscn")
