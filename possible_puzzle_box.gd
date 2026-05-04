@@ -81,10 +81,13 @@ func complete_puzzle():
 	completed = true
 	is_holding = false
 	
+	Stats.switches_pulled += 1
+	Stats.save_stats()
+	
 	ding.play()
 
 
 func _on_ding_finished():
 	print("PUZZLE COMPLETE")
-	$"../../PuzzlesManager".puzzle_completed()
+	PuzzlesManager.puzzle_completed()
 	queue_free()

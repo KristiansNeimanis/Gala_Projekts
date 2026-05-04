@@ -37,6 +37,8 @@ var paused = false
 @onready var pause_menu = $PauseMenu
 
 func _ready():
+	PuzzlesManager.total_puzzles = puzzle_number
+	MusicPlayer.stop_music()
 	generate()
 
 func _process(_delta):
