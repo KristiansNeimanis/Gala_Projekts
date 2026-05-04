@@ -2,6 +2,10 @@ extends Node3D
 
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	Stats.deaths += 1
+	Stats.save_stats()
+	
+	PuzzlesManager.puzzles_complete = 0
 
 func _on_main_pressed():
 	get_tree().change_scene_to_file("res://Scenes/Menu_stuff/main_menu.tscn")
