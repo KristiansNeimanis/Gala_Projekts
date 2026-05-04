@@ -29,7 +29,7 @@ var next_location
 
 @onready var SPEED = 1.75
 @onready var WALK_SPEED = 1.75
-@onready var RUN_SPEED = 3.6
+@onready var RUN_SPEED = 3.65
 
 const BOB_FREQ = 2.5
 const BOB_AMP = 0.13
@@ -50,13 +50,14 @@ var is_standing = false
 
 @onready var groan = $groan
 @onready var roar = $roar
+var play_roar = true
 
 
 func _process(_delta):
 	if seeing == false and are_alert == false:
 		if decided == false:
 			decided = true
-			random_decision.wait_time = randf_range(4, 6)
+			random_decision.wait_time = randf_range(10, 15)
 			random_decision.start()
 	
 	if is_in_attack_range == true and seeing == true:
@@ -73,25 +74,19 @@ func _ready():
 
 func _physics_process(delta):
 	self.pointer.look_at(player.global_transform.origin)
-	
-	if is_standing:
-		velocity = Vector3.ZERO
-		nav.set_velocity(Vector3.ZERO)
-
-		if animation.current_animation != "Idle1_Action":
-			animation.play("Idle1_Action")
-
-		move_and_slide()
-		return
 
 	if self.pointer.is_colliding():
 		p_collider = self.pointer.get_collider()
 		if p_collider.is_in_group("Player") == true and in_cone == true:
 			seeing = true
+			print("SEE YOU!!!!!!!")
 			seen_timer.stop()
-
+			
 			if !tracking:
-				roar.play()
+				print("TRACKING YOU")
+				if play_roar == true:
+					roar.play()
+					play_roar = false
 				tracking = true
 				tracking_lost_sight = false
 		else:
@@ -103,6 +98,7 @@ func _physics_process(delta):
 	if !seeing and tracking and seen_timer.is_stopped():
 		tracking = false
 		tracking_lost_sight = false
+		play_roar = true
 
 	if seeing == true:
 		going = false
@@ -135,9 +131,16 @@ func _physics_process(delta):
 		nav.set_velocity(new_velocity)
 
 	if is_standing:
-		if animation.current_animation != "Idle2_Action":
-			animation.play("Idle2_Action")
-	
+		velocity = Vector3.ZERO
+		nav.set_velocity(Vector3.ZERO)
+
+		if animation.current_animation != "Idle1_Action":
+			animation.play("Idle1_Action")
+
+		move_and_slide()
+		return
+
+
 	t_bob += delta * velocity.length() * float(is_on_floor())
 	camera.transform.origin = _headbob(t_bob)
 	
@@ -172,6 +175,9 @@ func _set_new_destination():
 
 	var loc = locations.get_children()
 	var location = loc.pick_random()
+	
+	stand_timer.start()
+	groan.play()
 
 	update_target_location(location.global_transform.origin)
 
@@ -198,11 +204,13 @@ func _on_navigation_agent_3d_velocity_computed(safe_velocity):
 
 
 func _on_vision_cone_body_entered(body):
+	print("IN CONE")
 	if body.name == player.name:
 		in_cone = true
 
 
 func _on_vision_cone_body_exited(body):
+	print("OUT OF CONE")
 	if body.name == player.name:
 		in_cone = false
 
