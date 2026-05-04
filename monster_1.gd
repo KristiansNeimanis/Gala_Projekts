@@ -13,16 +13,12 @@ var tracking_lost_sight = false
 
 @onready var animation = $character/Animation
 
-@onready var agent = $NavigationAgent3D
-
 @onready var character = $character
 
 @onready var attack_area = $Attack_area
 var is_attacking = false
 var can_attack = true
 var is_in_attack_range = false
-
-@onready var body = $CollisionShape3D
 
 @onready var nav = $NavigationAgent3D
 var next_location
@@ -38,10 +34,6 @@ var t_bob = 0.0
 var can_play : bool = true
 signal step
 
-var can_hear = false
-var are_alert = false
-@onready var allert_time = $allert_time
-
 @onready var random_decision = $Random_decision
 var decided = false
 
@@ -54,7 +46,7 @@ var play_roar = true
 
 
 func _process(_delta):
-	if seeing == false and are_alert == false:
+	if seeing == false:
 		if decided == false:
 			decided = true
 			random_decision.wait_time = randf_range(10, 15)
@@ -79,11 +71,9 @@ func _physics_process(delta):
 		p_collider = self.pointer.get_collider()
 		if p_collider.is_in_group("Player") == true and in_cone == true:
 			seeing = true
-			print("SEE YOU!!!!!!!")
 			seen_timer.stop()
 			
 			if !tracking:
-				print("TRACKING YOU")
 				if play_roar == true:
 					roar.play()
 					play_roar = false
@@ -98,20 +88,17 @@ func _physics_process(delta):
 	if !seeing and tracking and seen_timer.is_stopped():
 		tracking = false
 		tracking_lost_sight = false
-		play_roar = true
 
 	if seeing == true:
 		going = false
 		SPEED = RUN_SPEED
 		update_target_location(player.global_transform.origin)
 	else:
-		if are_alert == true:
-			SPEED = RUN_SPEED
 		if going == false:
 			going = true
 			_set_new_destination()
 
-	if seeing == true or are_alert == true:
+	if seeing == true:
 		if is_in_attack_range == true and seeing == true:
 			pass
 		elif animation.current_animation != "Walk1_Action":
@@ -168,14 +155,12 @@ func update_target_location(target_location):
 
 
 func _set_new_destination():
-	if are_alert == true:
-		SPEED = RUN_SPEED
-	else:
-		SPEED = WALK_SPEED
+	SPEED = WALK_SPEED
 
 	var loc = locations.get_children()
 	var location = loc.pick_random()
 	
+	play_roar = true
 	stand_timer.start()
 	groan.play()
 
@@ -204,13 +189,11 @@ func _on_navigation_agent_3d_velocity_computed(safe_velocity):
 
 
 func _on_vision_cone_body_entered(body):
-	print("IN CONE")
 	if body.name == player.name:
 		in_cone = true
 
 
 func _on_vision_cone_body_exited(body):
-	print("OUT OF CONE")
 	if body.name == player.name:
 		in_cone = false
 
@@ -222,7 +205,7 @@ func _on_seen_timer_timeout():
 
 
 func _on_random_decision_timeout():
-	if seeing == true or are_alert == true:
+	if seeing == true:
 		decided = false
 		return
 
