@@ -1,10 +1,10 @@
 extends Node3D
 
-@onready var resolution = $VBoxContainer/HBoxContainer/Resolution
-@onready var window_mode = $VBoxContainer/HBoxContainer/Window_mode
-@onready var fps_limit = $VBoxContainer/HBoxContainer/FPS
-@onready var volume_slider = $VBoxContainer/volume
-@onready var vsync_toggle = $VBoxContainer/HBoxContainer/Vsync
+@onready var resolution = $Resolution
+@onready var window_mode = $Window_mode
+@onready var fps_limit = $FPS
+@onready var volume_slider = $volume
+@onready var vsync_toggle = $Vsync
 
 
 func _ready():

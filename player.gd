@@ -19,6 +19,8 @@ var t_bob = 0.0
 var can_play : bool = true
 signal step
 
+var has_moved = false
+
 @onready var follow_head_x = $follow_head_x
 @onready var follow_head_y = $follow_head_x/follow_head_y
 @onready var flashlight_base = $follow_head_x/follow_head_y/Flashlight
@@ -130,6 +132,7 @@ func _physics_process(delta):
 	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_backwards")
 	var direction = (head.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	if direction:
+		has_moved = true
 		velocity.x = direction.x * SPEED
 		velocity.z = direction.z * SPEED
 	else:

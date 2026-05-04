@@ -44,7 +44,6 @@ var is_standing = false
 @onready var roar = $roar
 var play_roar = true
 
-
 func _process(_delta):
 	if seeing == false:
 		if decided == false:

@@ -1,5 +1,8 @@
 #@tool
 extends Node3D
+@onready var player = $Player
+@onready var monster = $Monster_1
+@onready var timer = $Player/UI/Timer
 
 #@export var start : bool = false : set = set_start
 #@export var border_size : int = 20 : set = set_border_size
@@ -42,6 +45,10 @@ func _ready():
 	generate()
 
 func _process(_delta):
+	if player.has_moved == true:
+		monster.process_mode = Node.PROCESS_MODE_INHERIT
+		timer.process_mode = Node.PROCESS_MODE_INHERIT
+		
 	if Input.is_action_just_pressed("pause"):
 		pauseMenu()
 
