@@ -1,12 +1,12 @@
 ===================================
-           DEEP CRAWL
+		   DEEP CRAWL
 ===================================
 
 📘 Description
 -----------------------------------
-Deep Crawl is a puzzle/horror game where you try to escape a randomly generated dungeon while a monster is lurking around trying to catch you. 
-The objective is to find and complete all puzzles in the dungeon so that an exit door appears with which you escape and finish the game/level. 
-It was developed using "Godot engine", "GDScript", "SQLite", "Blender".
+Deep Crawl is a horror game where you try to escape a randomly generated dungeon while a monster is lurking around trying to catch you. 
+The objective is to find and pull all switches in the dungeon so that an exit door opens with which you escape and finish the game/level. 
+It was developed using "Godot engine", "GDScript", "Blender".
 
 🎮 How to Play
 -----------------------------------
@@ -16,14 +16,11 @@ It was developed using "Godot engine", "GDScript", "SQLite", "Blender".
 - Interact: "E".
 - Pause: "esc".
 - Flashlight/Lantern on/off: "F".
-
-❗Pro Tip
------------------------------------
-Try to be quiet and keep moving, or it will most definitly find you.
+- Flashlight narrow/widen light: "scrool wheel".
 
 🧩 Installation / Running the Game
 -----------------------------------
-1. Download or unzip the game folder.
+1. Download and unzip the game folder.
 2. Run Deep_Crawl.exe
 3. Have fun!
 
@@ -35,13 +32,6 @@ Try to be quiet and keep moving, or it will most definitly find you.
 - Graphics: GTX 950M Minimum
 - Storage: 10GB
 
-👥 Credits
------------------------------------
-Developed by: Kristians Neimanis
-Art by: Kristians Neimanis
-Music by: Kristians Neimanis
-Special thanks to: Kristians Neimanis
-
 📜 License / Usage
 -----------------------------------
 This game is free for personal use.
@@ -51,4 +41,3 @@ Do not redistribute or sell without permission.
 -----------------------------------
 For feedback or bug reports:
 Download Godot Engine, open the source code with it and fix it yourself.
-
